@@ -1,4 +1,4 @@
-function(target_set_warnings)
+function (target_set_warnings)
     set(oneValueArgs TARGET ENABLE AS_ERRORS)
     cmake_parse_arguments(
         TARGET_SET_WARNINGS
@@ -7,10 +7,10 @@ function(target_set_warnings)
         "${multiValueArgs}"
         ${ARGN})
 
-    if(NOT ${TARGET_SET_WARNINGS_ENABLE})
+    if (NOT ${TARGET_SET_WARNINGS_ENABLE})
         message("==> Warnings Disabled for: ${TARGET_SET_WARNINGS_TARGET}")
         return()
-    endif()
+    endif ()
     message("==> Warnings Active for: ${TARGET_SET_WARNINGS_TARGET}")
     message("==> Warnings as Errors: ${TARGET_SET_WARNINGS_AS_ERRORS}")
 
@@ -53,20 +53,20 @@ function(target_set_warnings)
 
     set(GCC_WARNINGS ${CLANG_WARNINGS})
 
-    if(${TARGET_SET_WARNINGS_AS_ERRORS})
+    if (${TARGET_SET_WARNINGS_AS_ERRORS})
         set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
         set(GCC_WARNINGS ${GCC_WARNINGS} -Werror)
         set(MSVC_WARNINGS ${MSVC_WARNINGS} /WX)
-    endif()
+    endif ()
 
-    if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         set(WARNINGS ${MSVC_WARNINGS})
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(WARNINGS ${CLANG_WARNINGS})
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set(WARNINGS ${GCC_WARNINGS})
-    endif()
+    endif ()
 
     target_compile_options(${TARGET_SET_WARNINGS_TARGET} PRIVATE ${WARNINGS})
 
-endfunction(target_set_warnings)
+endfunction (target_set_warnings)

@@ -6,13 +6,13 @@ set(LIBRARY_INCLUDES "./" "${CMAKE_BINARY_DIR}/configured_files/include")
 # MyLib Library
 add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 target_include_directories(${LIBRARY_NAME} PUBLIC ${LIBRARY_INCLUDES})
-target_link_libraries(
-    ${LIBRARY_NAME}
-    PRIVATE nlohmann_json::nlohmann_json
-            fmt::fmt
-            spdlog::spdlog
-            cxxopts::cxxopts)
-
+#target_link_libraries(
+#    ${LIBRARY_NAME}
+#    PRIVATE nlohmann_json::nlohmann_json
+#            fmt::fmt
+#            spdlog::spdlog
+#            cxxopts::cxxopts)
+#
 target_set_warnings(
     TARGET
     ${LIBRARY_NAME}
@@ -23,8 +23,8 @@ target_set_warnings(
 
 add_linter_tool_to_target(${LIBRARY_NAME})
 
-if(${ENABLE_LTO})
+if (${ENABLE_LTO})
     target_enable_lto(${LIBRARY_NAME} optimized)
-endif()
+endif ()
 
 add_clang_tidy_msvc_to_target(${LIBRARY_NAME})

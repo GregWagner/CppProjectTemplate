@@ -1,7 +1,7 @@
-function(add_cmake_format_target)
-    if(NOT ${ENABLE_CMAKE_FORMAT})
+function (add_cmake_format_target)
+    if (NOT ${ENABLE_CMAKE_FORMAT})
         return()
-    endif()
+    endif ()
     set(ROOT_CMAKE_FILES "${CMAKE_SOURCE_DIR}/CMakeLists.txt")
     file(GLOB_RECURSE CMAKE_FILES_TXT "*/CMakeLists.txt")
     file(GLOB_RECURSE CMAKE_FILES_C "cmake/*.cmake")
@@ -13,10 +13,10 @@ function(add_cmake_format_target)
         "${CMAKE_SOURCE_DIR}/(build|external)/.*")
     set(CMAKE_FILES ${ROOT_CMAKE_FILES} ${CMAKE_FILES_TXT} ${CMAKE_FILES_C})
     find_program(CMAKE_FORMAT cmake-format)
-    if(CMAKE_FORMAT)
+    if (CMAKE_FORMAT)
         message("==> Added Cmake Format")
         set(FORMATTING_COMMANDS)
-        foreach(cmake_file ${CMAKE_FILES})
+        foreach (cmake_file ${CMAKE_FILES})
             list(
                 APPEND
                 FORMATTING_COMMANDS
@@ -26,24 +26,24 @@ function(add_cmake_format_target)
                 ${CMAKE_SOURCE_DIR}/.cmake-format.yaml
                 -i
                 ${cmake_file})
-        endforeach()
+        endforeach ()
         add_custom_target(
             run_cmake_format
             COMMAND ${FORMATTING_COMMANDS}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    else()
+    else ()
         message("==> CMAKE_FORMAT NOT FOUND")
-    endif()
-endfunction()
+    endif ()
+endfunction ()
 
-function(add_clang_format_target)
-    if(NOT ${ENABLE_CLANG_FORMAT})
+function (add_clang_format_target)
+    if (NOT ${ENABLE_CLANG_FORMAT})
         return()
-    endif()
+    endif ()
     find_package(Python3 COMPONENTS Interpreter)
-    if(NOT ${Python_FOUND})
+    if (NOT ${Python_FOUND})
         return()
-    endif()
+    endif ()
     file(GLOB_RECURSE CMAKE_FILES_CC "*/*.cc")
     file(GLOB_RECURSE CMAKE_FILES_CPP "*/*.cpp")
     file(GLOB_RECURSE CMAKE_FILES_H "*/*.h")
@@ -60,7 +60,7 @@ function(add_clang_format_target)
         REGEX
         "${CMAKE_SOURCE_DIR}/(build|external)/.*")
     find_program(CLANGFORMAT clang-format)
-    if(CLANGFORMAT)
+    if (CLANGFORMAT)
         message("==> Added Clang Format")
         add_custom_target(
             run_clang_format
@@ -70,18 +70,18 @@ function(add_clang_format_target)
                 --in-place
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             USES_TERMINAL)
-    else()
+    else ()
         message("==> CLANGFORMAT NOT FOUND")
-    endif()
-endfunction()
+    endif ()
+endfunction ()
 
 # iwyu, clang-tidy and cppcheck
-function(add_linter_tool_to_target target)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+function (add_linter_tool_to_target target)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         message(
             "==> Cppcheck, IWYU and Clang-Tidy Targets do not work with MSVC")
         return()
-    endif()
+    endif ()
     get_target_property(TARGET_SOURCES ${target} SOURCES)
     list(
         FILTER
@@ -90,9 +90,9 @@ function(add_linter_tool_to_target target)
         REGEX
         ".*.(cc|h|cpp|hpp)")
 
-    if(ENABLE_CPPCHECK)
+    if (ENABLE_CPPCHECK)
         find_program(CPPCHECK cppcheck)
-        if(CPPCHECK)
+        if (CPPCHECK)
             message("==> Added Cppcheck for Target: ${target}")
             add_custom_target(
                 ${target}_cppcheck
@@ -103,21 +103,21 @@ function(add_linter_tool_to_target target)
                     --project=${CMAKE_BINARY_DIR}/compile_commands.json
                     -i${CMAKE_BINARY_DIR}/ -i${CMAKE_SOURCE_DIR}/external/
                 USES_TERMINAL)
-        else()
+        else ()
             message("==> CPPCHECK NOT FOUND")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     find_package(Python3 COMPONENTS Interpreter)
-    if(NOT ${Python_FOUND})
+    if (NOT ${Python_FOUND})
         message("==> Python3 needed for IWYU and Clang-Tidy")
         return()
-    endif()
+    endif ()
 
-    if(ENABLE_INCLUDE_WHAT_YOU_USE)
-        if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (ENABLE_INCLUDE_WHAT_YOU_USE)
+        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             find_program(INCLUDE_WHAT_YOU_USE include-what-you-use)
-            if(INCLUDE_WHAT_YOU_USE)
+            if (INCLUDE_WHAT_YOU_USE)
                 add_custom_target(
                     ${target}_iwyu
                     COMMAND
@@ -125,17 +125,17 @@ function(add_linter_tool_to_target target)
                         ${CMAKE_SOURCE_DIR}/tools/iwyu_tool.py -p
                         ${CMAKE_BINARY_DIR} ${TARGET_SOURCES}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-            else()
+            else ()
                 message("==> INCLUDE_WHAT_YOU_USE NOT FOUND")
-            endif()
-        else()
+            endif ()
+        else ()
             message("==> INCLUDE_WHAT_YOU_USE NEEDS CLANG COMPILER")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
-    if(ENABLE_CLANG_TIDY)
+    if (ENABLE_CLANG_TIDY)
         find_program(CLANGTIDY clang-tidy)
-        if(CLANGTIDY)
+        if (CLANGTIDY)
             message("==> Added Clang Tidy for Target: ${target}")
             add_custom_target(
                 ${target}_clangtidy
@@ -149,24 +149,24 @@ function(add_linter_tool_to_target target)
                     -p=${CMAKE_BINARY_DIR}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 USES_TERMINAL)
-        else()
+        else ()
             message("==> CLANGTIDY NOT FOUND")
-        endif()
-    endif()
-endfunction()
+        endif ()
+    endif ()
+endfunction ()
 
-function(add_clang_tidy_msvc_to_target target)
-    if(NOT
-       CMAKE_CXX_COMPILER_ID
-       MATCHES
-       "MSVC")
+function (add_clang_tidy_msvc_to_target target)
+    if (NOT
+        CMAKE_CXX_COMPILER_ID
+        MATCHES
+        "MSVC")
         return()
-    endif()
-    if(ENABLE_CLANG_TIDY)
+    endif ()
+    if (ENABLE_CLANG_TIDY)
         message("==> Added MSVC ClangTidy (VS GUI only) for: ${target}")
         set_target_properties(
             ${target} PROPERTIES VS_GLOBAL_EnableMicrosoftCodeAnalysis false)
         set_target_properties(
             ${target} PROPERTIES VS_GLOBAL_EnableClangTidyCodeAnalysis true)
-    endif()
-endfunction(add_clang_tidy_msvc_to_target)
+    endif ()
+endfunction (add_clang_tidy_msvc_to_target)

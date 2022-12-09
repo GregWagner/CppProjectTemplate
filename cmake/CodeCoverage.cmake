@@ -43,7 +43,7 @@
 
 include(CMakeParseArguments)
 
-if(ENABLE_COVERAGE)
+if (ENABLE_COVERAGE)
     # Check prereqs
     find_program(GCOV_PATH gcov)
     find_program(
@@ -56,19 +56,19 @@ if(ENABLE_COVERAGE)
     find_program(GCOVR_PATH gcovr PATHS ${CMAKE_SOURCE_DIR}/scripts/test)
     find_program(CPPFILT_PATH NAMES c++filt)
 
-    if(NOT GCOV_PATH)
+    if (NOT GCOV_PATH)
         message(FATAL_ERROR "gcov not found! Aborting...")
-    endif() # NOT GCOV_PATH
+    endif () # NOT GCOV_PATH
 
-    if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
-        if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
+    if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+        if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
             message(
                 FATAL_ERROR
                     "Clang version must be 3.0.0 or greater! Aborting...")
-        endif()
-    elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
+        endif ()
+    elseif (NOT CMAKE_COMPILER_IS_GNUCXX)
         message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
-    endif()
+    endif ()
 
     set(COVERAGE_COMPILER_FLAGS
         "-g -O0 -fprofile-arcs -ftest-coverage"
@@ -98,27 +98,27 @@ if(ENABLE_COVERAGE)
         CMAKE_EXE_LINKER_FLAGS_COVERAGE
         CMAKE_SHARED_LINKER_FLAGS_COVERAGE)
 
-    if(NOT
-       CMAKE_BUILD_TYPE
-       STREQUAL
-       "Debug")
+    if (NOT
+        CMAKE_BUILD_TYPE
+        STREQUAL
+        "Debug")
         message(
             WARNING
                 "Code coverage results with an optimised (non-Debug) build may be misleading"
         )
-    endif() # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
+    endif () # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
 
-    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
         link_libraries(gcov)
-    endif()
-endif()
+    endif ()
+endif ()
 
 # Defines a target for running and collection code coverage information Builds
 # dependencies, runs the given executable and outputs reports. NOTE! The
 # executable should always have a ZERO as exit code otherwise the coverage
 # generation will not complete.
 #
-function(setup_target_for_coverage_lcov)
+function (setup_target_for_coverage_lcov)
     set(options NO_DEMANGLE)
     set(oneValueArgs BASE_DIRECTORY NAME)
     set(multiValueArgs
@@ -135,41 +135,41 @@ function(setup_target_for_coverage_lcov)
         "${multiValueArgs}"
         ${ARGN})
 
-    if(NOT LCOV_PATH)
+    if (NOT LCOV_PATH)
         message(FATAL_ERROR "lcov not found! Aborting...")
-    endif() # NOT LCOV_PATH
+    endif () # NOT LCOV_PATH
 
-    if(NOT GENHTML_PATH)
+    if (NOT GENHTML_PATH)
         message(FATAL_ERROR "genhtml not found! Aborting...")
-    endif() # NOT GENHTML_PATH
+    endif () # NOT GENHTML_PATH
 
     # Set base directory (as absolute path), or default to PROJECT_SOURCE_DIR
-    if(${Coverage_BASE_DIRECTORY})
+    if (${Coverage_BASE_DIRECTORY})
         get_filename_component(BASEDIR ${Coverage_BASE_DIRECTORY} ABSOLUTE)
-    else()
+    else ()
         set(BASEDIR ${PROJECT_SOURCE_DIR})
-    endif()
+    endif ()
 
     # Collect excludes (CMake 3.4+: Also compute absolute paths)
     set(LCOV_EXCLUDES "")
-    foreach(EXCLUDE ${Coverage_EXCLUDE} ${COVERAGE_EXCLUDES}
-                    ${COVERAGE_LCOV_EXCLUDES})
-        if(CMAKE_VERSION VERSION_GREATER 3.4)
+    foreach (EXCLUDE ${Coverage_EXCLUDE} ${COVERAGE_EXCLUDES}
+                     ${COVERAGE_LCOV_EXCLUDES})
+        if (CMAKE_VERSION VERSION_GREATER 3.4)
             get_filename_component(
                 EXCLUDE
                 ${EXCLUDE}
                 ABSOLUTE
                 BASE_DIR
                 ${BASEDIR})
-        endif()
+        endif ()
         list(APPEND LCOV_EXCLUDES "${EXCLUDE}")
-    endforeach()
+    endforeach ()
     list(REMOVE_DUPLICATES LCOV_EXCLUDES)
 
     # Conditional arguments
-    if(CPPFILT_PATH AND NOT ${Coverage_NO_DEMANGLE})
+    if (CPPFILT_PATH AND NOT ${Coverage_NO_DEMANGLE})
         set(GENHTML_EXTRA_ARGS "--demangle-cpp")
-    endif()
+    endif ()
 
     # Setup target
     add_custom_target(
@@ -229,9 +229,9 @@ function(setup_target_for_coverage_lcov)
         COMMENT
             "Open ./${Coverage_NAME}/index.html in your browser to view the coverage report."
     )
-endfunction() # setup_target_for_coverage_lcov
+endfunction () # setup_target_for_coverage_lcov
 
-function(append_coverage_compiler_flags)
+function (append_coverage_compiler_flags)
     set(CMAKE_C_FLAGS
         "${CMAKE_C_FLAGS} ${COVERAGE_COMPILER_FLAGS}"
         PARENT_SCOPE)
@@ -241,4 +241,4 @@ function(append_coverage_compiler_flags)
     message(
         "==> Appending code coverage compiler flags: ${COVERAGE_COMPILER_FLAGS}"
     )
-endfunction() # append_coverage_compiler_flags
+endfunction () # append_coverage_compiler_flags

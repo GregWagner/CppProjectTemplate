@@ -1,4 +1,4 @@
-if(ENABLE_TESTING)
+if (ENABLE_TESTING)
     set(TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cc")
     set(TEST_HEADERS "")
 
@@ -17,7 +17,7 @@ if(ENABLE_TESTING)
 
     add_linter_tool_to_target(${UNIT_TEST_NAME})
 
-    if(ENABLE_COVERAGE)
+    if (ENABLE_COVERAGE)
         set(COVERAGE_MAIN "coverage")
         set(COVERAGE_EXCLUDES
             "${PROJECT_SOURCE_DIR}/app/*"
@@ -34,5 +34,5 @@ if(ENABLE_TESTING)
             ${UNIT_TEST_NAME}
             DEPENDENCIES
             ${UNIT_TEST_NAME})
-    endif()
-endif()
+    endif ()
+endif ()
